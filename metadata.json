@@ -1,0 +1,6 @@
+{
+  "name": "Pramuka: Rahasia Benteng Kosong | 3D Animated Story",
+  "description": "Cinematic 3D animated video and story following Indonesian Scouts Candra, Rizki, and Rana as they discover the power of collaboration at Pos Benteng Kosong.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
