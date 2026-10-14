@@ -1,3 +1,10 @@
+import sceneImage1 from '../assets/images/scout_scene_one_1791902086727.jpg';
+import sceneImage2 from '../assets/images/scout_scene_two_1791902088092.jpg';
+import sceneImage3 from '../assets/images/scout_scene_three_1791902088344.jpg';
+import sceneImage4 from '../assets/images/scout_scene_four_1791902088527.jpg';
+import sceneImage5 from '../assets/images/scout_scene_five_1791902089878.jpg';
+import sceneImage6 from '../assets/images/scout_scene_six_1791902089337.jpg';
+
 export interface SceneData {
   id: number;
   panelNumber: number;
@@ -34,7 +41,7 @@ export const SCOUT_SCENES: SceneData[] = [
     panelNumber: 1,
     titleId: 'Perdebatan di Pos Benteng Kosong',
     titleEn: 'Dispute at the Empty Fort Post',
-    image: '/src/assets/images/scout_scene_one_1791902086727.jpg',
+    image: sceneImage1,
     durationSec: 6.5,
     cameraStyle: 'pan-left-to-right',
     dialogueId: [
@@ -71,7 +78,7 @@ export const SCOUT_SCENES: SceneData[] = [
     panelNumber: 2,
     titleId: 'Perebutan Peta yang Terbelah',
     titleEn: 'Tugging the Torn Map',
-    image: '/src/assets/images/scout_scene_two_1791902088092.jpg',
+    image: sceneImage2,
     durationSec: 5.5,
     cameraStyle: 'zoom-in-dramatic',
     dialogueId: [
@@ -99,7 +106,7 @@ export const SCOUT_SCENES: SceneData[] = [
     panelNumber: 3,
     titleId: 'Langkah Tegas Sang Pramuka Putri',
     titleEn: "Rana's Decisive Intervention",
-    image: '/src/assets/images/scout_scene_three_1791902088344.jpg',
+    image: sceneImage3,
     durationSec: 6.0,
     cameraStyle: 'pull-back-wide',
     dialogueId: [
@@ -127,7 +134,7 @@ export const SCOUT_SCENES: SceneData[] = [
     panelNumber: 4,
     titleId: 'Pesan Bijak Tentang Kolaborasi',
     titleEn: 'Wisdom of Collaboration',
-    image: '/src/assets/images/scout_scene_four_1791902088527.jpg',
+    image: sceneImage4,
     durationSec: 6.5,
     cameraStyle: 'gentle-drift-in',
     dialogueId: [
@@ -155,7 +162,7 @@ export const SCOUT_SCENES: SceneData[] = [
     panelNumber: 5,
     titleId: 'Cahaya Emas Peta Rahasia',
     titleEn: 'Golden Glow of the Unified Map',
-    image: '/src/assets/images/scout_scene_five_1791902089878.jpg',
+    image: sceneImage5,
     durationSec: 7.0,
     cameraStyle: 'celestial-glow-zoom',
     dialogueId: [
@@ -183,7 +190,7 @@ export const SCOUT_SCENES: SceneData[] = [
     panelNumber: 6,
     titleId: 'Kemenangan Sejati: Persatuan Pramuka',
     titleEn: 'True Victory: Scout Unity & Harmony',
-    image: '/src/assets/images/scout_scene_six_1791902089337.jpg',
+    image: sceneImage6,
     durationSec: 8.5,
     cameraStyle: 'epic-slow-dolly',
     dialogueId: [

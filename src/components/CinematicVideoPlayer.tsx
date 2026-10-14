@@ -44,71 +44,48 @@ export const CinematicVideoPlayer: React.FC<CinematicVideoPlayerProps> = ({
   const [isLetterbox, setIsLetterbox] = useState(true);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   const timerRef = useRef<number | null>(null);
 
   const currentScene = SCOUT_SCENES[currentSceneIndex];
 
-  useEffect(() => {
-    soundEngine.playSceneAmbience(currentScene.audioProfile.bgmMood);
 
-    if (currentScene.id === 2) {
-      setTimeout(() => soundEngine.playTearSfx(), 600);
-    } else if (currentScene.id === 3) {
-      setTimeout(() => soundEngine.playInterruptionSting(), 400);
-    } else if (currentScene.id === 5) {
-      setTimeout(() => soundEngine.playMagicalChimes(), 800);
-    } else if (currentScene.id === 6) {
-      setTimeout(() => soundEngine.playPeacefulHarmony(), 1000);
-    }
 
-    if (!isMuted) {
-      soundEngine.playSceneDialogue(currentScene.id, language);
-    }
-  }, [currentSceneIndex, currentScene, isMuted, language]);
+
 
   useEffect(() => {
-    if (!isPlaying) {
-      if (timerRef.current) cancelAnimationFrame(timerRef.current);
-      return;
+    const video = videoRef.current;
+    if (!video) return;
+
+    video.muted = isMuted;
+    video.playbackRate = playbackSpeed;
+
+    if (isPlaying) {
+      video.play().catch(() => setIsPlaying(false));
+    } else {
+      video.pause();
     }
+  }, [isPlaying, isMuted, playbackSpeed, setIsPlaying]);
 
-    let startTime = performance.now();
-    const duration = (currentScene.durationSec * 1000) / playbackSpeed;
-
-    const tick = (now: number) => {
-      const elapsed = now - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      setSceneProgress(progress);
-
-      if (progress < 1) {
-        timerRef.current = requestAnimationFrame(tick);
-      } else {
-        if (currentSceneIndex < SCOUT_SCENES.length - 1) {
-          onSceneChange(currentSceneIndex + 1);
-          setSceneProgress(0);
-        } else {
-          setIsPlaying(false);
-          setSceneProgress(1);
-        }
-      }
-    };
-
-    timerRef.current = requestAnimationFrame(tick);
-
-    return () => {
-      if (timerRef.current) cancelAnimationFrame(timerRef.current);
-    };
-  }, [isPlaying, currentSceneIndex, currentScene.durationSec, playbackSpeed, onSceneChange, setIsPlaying]);
+  const getSceneStart = (index: number) =>
+    SCOUT_SCENES.slice(0, index).reduce(
+      (sum, scene) => sum + scene.durationSec, 0
+    );
 
   const togglePlay = () => {
-    if (!isPlaying && sceneProgress >= 1 && currentSceneIndex === SCOUT_SCENES.length - 1) {
-      onSceneChange(0);
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (video.ended || video.currentTime >= video.duration) {
+      video.currentTime = 0;
       setSceneProgress(0);
     }
     setIsPlaying(!isPlaying);
   };
 
   const handleRestart = () => {
+    const video = videoRef.current;
+    if (video) video.currentTime = 0;
     onSceneChange(0);
     setSceneProgress(0);
     setIsPlaying(true);
@@ -159,17 +136,54 @@ export const CinematicVideoPlayer: React.FC<CinematicVideoPlayerProps> = ({
       }`}
     >
       <div className="relative aspect-video w-full overflow-hidden bg-slate-950 select-none">
-        <div
-          className="absolute inset-0 transition-transform duration-300 ease-out will-change-transform"
-          style={{
-            transform: getCameraTransform(),
-          }}
-        >
-          <img
-            src={currentScene.image}
-            alt={currentScene.titleId}
-            referrerPolicy="no-referrer"
-            className="h-full w-full object-cover object-center filter transition-all duration-700"
+        <div className="absolute inset-0">
+          <video
+            ref={videoRef}
+            key={language}
+            src={language === 'id'
+              ? '/pramuka_pos_benteng_kosong_16x9.mp4'
+              : '/pramuka_pos_benteng_kosong_16x9_en.mp4'}
+            className="h-full w-full object-cover object-center"
+            playsInline
+            preload="auto"
+            muted={isMuted}
+            onLoadedMetadata={(event) => {
+              const video = event.currentTarget;
+              const sceneStart = SCOUT_SCENES
+                .slice(0, currentSceneIndex)
+                .reduce((sum, scene) => sum + scene.durationSec, 0);
+
+              video.currentTime = sceneStart;
+              video.muted = isMuted;
+              video.playbackRate = playbackSpeed;
+
+              if (isPlaying) {
+                video.play().catch(() => setIsPlaying(false));
+              } else {
+                video.pause();
+              }
+            }}
+            onTimeUpdate={() => {
+              const video = videoRef.current;
+              if (!video || !Number.isFinite(video.currentTime)) return;
+
+              let elapsed = 0;
+              for (let i = 0; i < SCOUT_SCENES.length; i++) {
+                const end = elapsed + SCOUT_SCENES[i].durationSec;
+                if (video.currentTime < end || i === SCOUT_SCENES.length - 1) {
+                  setSceneProgress(Math.max(0, Math.min(
+                    1, (video.currentTime - elapsed) / SCOUT_SCENES[i].durationSec
+                  )));
+                  if (currentSceneIndex !== i) onSceneChange(i);
+                  break;
+                }
+                elapsed = end;
+              }
+            }}
+            onEnded={() => {
+              setSceneProgress(1);
+              setIsPlaying(false);
+            }}
           />
         </div>
 
@@ -318,6 +332,8 @@ export const CinematicVideoPlayer: React.FC<CinematicVideoPlayerProps> = ({
                 <button
                   key={scene.id}
                   onClick={() => {
+                    const video = videoRef.current;
+                    if (video) video.currentTime = getSceneStart(idx);
                     onSceneChange(idx);
                     setSceneProgress(0);
                     setIsPlaying(true);
